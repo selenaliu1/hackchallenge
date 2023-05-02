@@ -67,8 +67,8 @@ def get_user(user_id):
     return success_response(user.serialize())
 
 
-@app.route("/api/courses/<int:course_id>/", methods=["DELETE"])
-def delete_course(course_id):
+@app.route("/api/user/<int:user_id>/", methods=["DELETE"])
+def delete_user(user_id):
     """
     Endpoint for deleting a task by id
     """
