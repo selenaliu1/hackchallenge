@@ -1,10 +1,10 @@
 import json
 from db import db
 from flask import Flask, request
-from db import Course, Assignments,User
+from db import User, Reviews, Dining_hall
 
 app = Flask(__name__)
-db_filename = "cms.db"
+db_filename = "food.db"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///%s" % db_filename
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -23,19 +23,24 @@ def failure_response(message, code=404):
     return json.dumps({"error": message}), code
 
 
+@app.route("/reviews/")
+def get_all_reviews():
+    reviews = [review.serialize() for review in Reviews.query.all()] 
+    return success_response({"Reviews": reviews})  
+    
 
-@app.route("/")
-@app.route("/api/user/")
-def get_users():
+@app.route("/reviews/<int:dining_hall_id>/")
+def get_reviews_by_dh(dining_hall_id):
     """
-    Endpoint for getting all users
+    Endpoint for getting reviews by dining hall
     """
+    reviews = [reviews.serialize() for review in Reviews.query.filter_by(id=dining_hall_id).first()] #test
+    if reviews is None:
+        return failure_response("Dining hall not found", 400) #what if its correct dining hall but there's no reviews?
+    return success_response(reviews.serialize())                                                                                                         
 
-    users = [user.serialize() for user in User.query.all()] 
-    return success_response({"users": users})                                                                                                          
 
-
-@app.route("/api/user/", methods=["POST"])
+@app.route("/user/", methods=["POST"])
 def create_user():
     """
     Endpoint for creating a new review
@@ -108,14 +113,13 @@ def create_assignments(course_id):
     return success_response(result,201)
 
 
-
+'''
 @app.route("/api/users/", methods=["POST"])
 def create_user():
     """
     Endpoint for creating a subtask
     for a task by id
     """
-
     body = json.loads(request.data)
     new_user = User(
         name = body.get("name"),
@@ -129,6 +133,7 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     return success_response(new_user.serialize(),201)
+'''
 
 @app.route("/api/users/<int:user_id>/")
 def get_user(user_id):
