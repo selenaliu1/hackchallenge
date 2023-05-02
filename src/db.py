@@ -35,7 +35,7 @@ class User(db.Model):
 
     def simple_serialize(self):
         """
-        Serialize a User object without the assignments, isntructors, students
+        Serialize a User object without the reviews
         """
 
         return {
@@ -55,7 +55,6 @@ class Reviews(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     dining_hall_id = db.Column(db.Integer, db.ForeignKey("dining_hall.id"), nullable=False)
-    dining_hall =  db.relationship("User", cascade="delete")
 
 
     def __init__(self, **kwargs):
@@ -76,7 +75,6 @@ class Reviews(db.Model):
             "id": self.id,
             "review": self.review,
             "rating": self.rating,
-            "dining_hall": [c.simple_serialize() for c in self.instructors],
         }
 
 class Dining_hall(db.Model):
@@ -87,7 +85,7 @@ class Dining_hall(db.Model):
     __tablename__ = "dining_hall"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    reviews = []
+    reviews =  db.relationship("Reviews", cascade="delete")
 
 
     def __init__(self, **kwargs):
@@ -105,8 +103,7 @@ class Dining_hall(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "reviews": self.reviews
-
+            "reviews": [c.simple_serialize() for c in self.reviews]
         }
 
     def simple_serialize(self):
