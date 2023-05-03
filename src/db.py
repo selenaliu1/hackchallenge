@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import date
 
 db = SQLAlchemy()
 
@@ -20,7 +21,7 @@ class User(db.Model):
 
         self.username = kwargs.get("username", "") 
         self.password = kwargs.get("password","")
-        
+
     def serialize(self):
         """
         Serializes a User object
@@ -55,6 +56,7 @@ class Reviews(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     dining_hall_id = db.Column(db.Integer, db.ForeignKey("dining_hall.id"), nullable=False)
+    #date = db.Column(db.String, nullable=True)
 
 
     def __init__(self, **kwargs):
@@ -65,6 +67,7 @@ class Reviews(db.Model):
         self.rating = kwargs.get("rating", False)
         self.user_id = kwargs.get("user_id")
         self.dining_hall_id = kwargs.get("dining_hall_id")
+        #self.date = date.today().strftime("%m/%d/%y")
 
     def serialize(self):
         """
@@ -74,7 +77,7 @@ class Reviews(db.Model):
         return {
             "id": self.id,
             "review": self.review,
-            "rating": self.rating,
+            "rating": self.rating
         }
 
 class Dining_hall(db.Model):
@@ -85,7 +88,7 @@ class Dining_hall(db.Model):
     __tablename__ = "dining_hall"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
-    reviews =  db.relationship("Reviews", cascade="delete")
+    reviews = db.relationship("Reviews", cascade="delete")
 
 
     def __init__(self, **kwargs):
